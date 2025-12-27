@@ -6,16 +6,19 @@ const logger = require('../utils/logger');
 
 class StorageService {
   constructor(config) {
-    this.config = config;
-    if (config.googleDrive.enabled) {
-      this.initGoogleDrive(config.googleDrive);
-    }
-    if (config.s3.enabled) {
-      this.initS3(config.s3);
+    this.config = config.storage;
+    this.storageType = this.config.provider;
+
+    if (this.storageType === 'googleDrive' && this.config.googleDrive.enabled) {
+      this.initGoogleDrive(this.config.googleDrive);
+    } else if (this.storageType === 's3' && this.config.s3.enabled) {
+      this.initS3(this.config.s3);
+    } else if (this.storageType === 'minio' && this.config.minio.enabled) {
+      this.initMinio(this.config.minio);
     }
   }
 
-  async initGoogleDrive(config) {
+  initGoogleDrive(config) {
     const credentials = require(path.resolve(config.credentialsPath));
     const auth = new google.auth.GoogleAuth({
       credentials,
@@ -33,7 +36,28 @@ class StorageService {
     this.s3Bucket = config.bucket;
   }
 
-  async uploadToGoogleDrive(filePath, type, filename) {
+  initMinio(config) {
+    this.s3 = new AWS.S3({
+      endpoint: config.endpoint,
+      accessKeyId: config.accessKeyId,
+      secretAccessKey: config.secretAccessKey,
+      s3ForcePathStyle: true,
+      signatureVersion: 'v4',
+      sslEnabled: config.useSSL
+    });
+    this.s3Bucket = config.bucket;
+  }
+
+  async upload(filePath, type, filename) {
+    if (this.storageType === 'googleDrive') {
+      return this._uploadToGoogleDrive(filePath, type, filename);
+    } else if (this.storageType === 's3' || this.storageType === 'minio') {
+      return this._uploadToS3(filePath, filename);
+    }
+    return null;
+  }
+
+  async _uploadToGoogleDrive(filePath, type, filename) {
     if (!this.drive) return;
     const folderMap = {
       voiceover: this.config.googleDrive.folders.voiceovers,
@@ -58,7 +82,7 @@ class StorageService {
     }
   }
 
-  async uploadToS3(filePath, filename) {
+  async _uploadToS3(filePath, filename) {
     if (!this.s3) return;
     const fileContent = fs.readFileSync(filePath);
     const key = path.basename(filePath);
@@ -68,10 +92,10 @@ class StorageService {
         Key: key,
         Body: fileContent
       }).promise();
-      logger.info(`Uploaded to S3: ${response.Location}`);
+      logger.info(`Uploaded to ${this.storageType}: ${response.Location}`);
       return response;
     } catch (error) {
-      logger.error(`S3 upload failed: ${error.message}`);
+      logger.error(`${this.storageType} upload failed: ${error.message}`);
       throw error;
     }
   }
