@@ -22,7 +22,13 @@ class VoiceService {
       logger.info(`Voiceover saved: ${outputPath}`);
       return outputPath;
     } catch (error) {
-      logger.error(`Voice generation failed: ${error.message}`);
+      if (error.response) {
+        // Since responseType is arraybuffer, we need to convert it back to string for logging
+        const dataString = Buffer.from(error.response.data).toString();
+        logger.error(`Voice generation failed (${error.response.status}): ${dataString}`);
+      } else {
+        logger.error(`Voice generation failed: ${error.message}`);
+      }
       throw error;
     }
   }

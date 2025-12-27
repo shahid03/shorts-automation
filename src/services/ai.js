@@ -43,7 +43,11 @@ Output as JSON with three fields:
       const content = response.data.choices[0].message.content;
       return JSON.parse(content);
     } catch (error) {
-      logger.error('AI content generation failed:', error.message);
+      if (error.response) {
+        logger.error(`AI content generation failed (${error.response.status}): ${JSON.stringify(error.response.data)}`);
+      } else {
+        logger.error('AI content generation failed:', error.message);
+      }
       throw error;
     }
   }
@@ -65,7 +69,11 @@ Only output the description, no formatting.`;
       });
       return response.data.choices[0].message.content.trim();
     } catch (error) {
-      logger.error('Description generation failed:', error.message);
+      if (error.response) {
+        logger.error(`Description generation failed (${error.response.status}): ${JSON.stringify(error.response.data)}`);
+      } else {
+        logger.error('Description generation failed:', error.message);
+      }
       throw error;
     }
   }
@@ -97,7 +105,11 @@ No commas or quotation marks in prompts.`;
       }
       return prompts;
     } catch (error) {
-      logger.error('Image prompt generation failed:', error.message);
+      if (error.response) {
+        logger.error(`Image prompt generation failed (${error.response.status}): ${JSON.stringify(error.response.data)}`);
+      } else {
+        logger.error('Image prompt generation failed:', error.message);
+      }
       throw error;
     }
   }

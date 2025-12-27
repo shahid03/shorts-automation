@@ -4,10 +4,10 @@ require('dotenv').config();
 module.exports = {
   // AI Models
   llm: {
-    provider: process.env.LLM_PROVIDER || 'openrouter',
-    model: process.env.LLM_MODEL || 'deepseek/deepseek-chat-v3-0324',
+    provider: process.env.LLM_PROVIDER || 'openai_compatible',
+    model: process.env.LLM_MODEL || 'gpt-3.5-turbo',
     apiKey: process.env.LLM_API_KEY,
-    baseUrl: process.env.LLM_BASE_URL || 'https://openrouter.ai/api/v1'
+    baseUrl: process.env.LLM_BASE_URL || 'https://api.openai.com/v1'
   },
 
   // Image Generation

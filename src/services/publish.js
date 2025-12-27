@@ -36,7 +36,11 @@ class PublishService {
       logger.info(`Published to YouTube: ${response.data.id}`);
       return response.data;
     } catch (error) {
-      logger.error(`YouTube publish failed: ${error.message}`);
+      if (error.response) {
+        logger.error(`YouTube publish failed (${error.response.status}): ${JSON.stringify(error.response.data)}`);
+      } else {
+        logger.error(`YouTube publish failed: ${error.message}`);
+      }
       throw error;
     }
   }
@@ -55,7 +59,11 @@ class PublishService {
       logger.info('Published to TikTok');
       return response.data;
     } catch (error) {
-      logger.error(`TikTok publish failed: ${error.message}`);
+      if (error.response) {
+        logger.error(`TikTok publish failed (${error.response.status}): ${JSON.stringify(error.response.data)}`);
+      } else {
+        logger.error(`TikTok publish failed: ${error.message}`);
+      }
       throw error;
     }
   }
@@ -74,7 +82,11 @@ class PublishService {
       logger.info('Published to Instagram');
       return response.data;
     } catch (error) {
-      logger.error(`Instagram publish failed: ${error.message}`);
+      if (error.response) {
+        logger.error(`Instagram publish failed (${error.response.status}): ${JSON.stringify(error.response.data)}`);
+      } else {
+        logger.error(`Instagram publish failed: ${error.message}`);
+      }
       throw error;
     }
   }

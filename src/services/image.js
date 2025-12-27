@@ -56,7 +56,11 @@ class ImageService {
       logger.info(`Image saved: ${outputPath}`);
       return outputPath;
     } catch (error) {
-      logger.error(`ComfyUI generation failed: ${error.message}`);
+      if (error.response) {
+        logger.error(`ComfyUI generation failed (${error.response.status}): ${JSON.stringify(error.response.data)}`);
+      } else {
+        logger.error(`ComfyUI generation failed: ${error.message}`);
+      }
       throw error;
     }
   }

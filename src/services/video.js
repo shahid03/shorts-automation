@@ -26,6 +26,9 @@ class VideoService {
       return outputPath;
     } catch (error) {
       logger.error(`Video creation failed: ${error.message}`);
+      if (error.stderr) {
+        logger.error(`FFmpeg stderr: ${error.stderr}`);
+      }
       throw error;
     }
   }
@@ -68,7 +71,15 @@ class VideoService {
       logger.info(`Captioned video saved: ${captionedPath}`);
       return captionedPath;
     } catch (error) {
-      logger.error(`Caption addition failed: ${error.message}`);
+      if (error.response) {
+        let errorData = error.response.data;
+        if (error.response.config.responseType === 'arraybuffer') {
+          errorData = Buffer.from(errorData).toString();
+        }
+        logger.error(`Caption addition failed (${error.response.status}): ${JSON.stringify(errorData)}`);
+      } else {
+        logger.error(`Caption addition failed: ${error.message}`);
+      }
       return videoPath;
     }
   }
