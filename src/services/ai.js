@@ -4,6 +4,15 @@ const logger = require('../utils/logger');
 class AIService {
   constructor(config) {
     this.config = config;
+
+    if (!config.baseUrl) {
+      throw new Error('LLM_BASE_URL is not configured. Please set LLM_BASE_URL in your .env file to your LLM provider\'s API endpoint (e.g., https://openrouter.ai/api/v1 or https://generativelanguage.googleapis.com/v1beta/openai/).');
+    }
+
+    if (!config.apiKey) {
+      throw new Error('LLM_API_KEY is not configured. Please set it in your .env file.');
+    }
+
     this.client = axios.create({
       baseURL: config.baseUrl,
       headers: {
