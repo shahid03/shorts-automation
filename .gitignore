@@ -1,0 +1,39 @@
+# Environment
+.env
+.env.local
+
+# Credentials
+config/*-credentials.json
+config/google-credentials.json
+config/youtube-credentials.json
+
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Logs
+logs/
+*.log
+
+# Generated content
+data/
+*.mp4
+*.mp3
+*.png
+*.jpg
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build
+dist/
+build/
