@@ -1,5 +1,5 @@
-const axios = require('axios');
-const logger = require('../utils/logger');
+const axios = require("axios");
+const logger = require("../utils/logger");
 
 class AIService {
   constructor(config) {
@@ -7,14 +7,17 @@ class AIService {
     this.client = axios.create({
       baseURL: config.baseUrl,
       headers: {
-        'Authorization': `Bearer ${config.apiKey}`,
-        'Content-Type': 'application/json'
-      }
+        Authorization: `Bearer ${config.apiKey}`,
+        "Content-Type": "application/json",
+      },
     });
   }
 
   async generateContent(contentConfig) {
-    const theme = contentConfig.themes[Math.floor(Math.random() * contentConfig.themes.length)];
+    const theme =
+      contentConfig.themes[
+        Math.floor(Math.random() * contentConfig.themes.length)
+      ];
     const prompt = `Write a single original stoic quote in the style of Marcus Aurelius or Seneca. Begin with a very short narrative hook (1-2 sentences), set in ancient Rome, followed by a single deep, reflective quote.
 
 Add a short, poetic title (max 5 words) that captures the essence or emotion of the piece.
@@ -35,18 +38,20 @@ Output as JSON with three fields:
 }`;
 
     try {
-      const response = await this.client.post('/chat/completions', {
+      const response = await this.client.post("/chat/completions", {
         model: this.config.model,
-        messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' }
+        messages: [{ role: "user", content: prompt }],
+        response_format: { type: "json_object" },
       });
       const content = response.data.choices[0].message.content;
       return JSON.parse(content);
     } catch (error) {
       if (error.response) {
-        logger.error(`AI content generation failed (${error.response.status}): ${JSON.stringify(error.response.data)}`);
+        logger.error(
+          `AI content generation failed (${error.response.status}): ${JSON.stringify(error.response.data)}`,
+        );
       } else {
-        logger.error('AI content generation failed:', error.message);
+        logger.error("AI content generation failed:", error.message);
       }
       throw error;
     }
@@ -62,17 +67,19 @@ Keywords: ${keywords}
 Only output the description, no formatting.`;
 
     try {
-      const response = await this.client.post('/chat/completions', {
+      const response = await this.client.post("/chat/completions", {
         model: this.config.model,
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 100
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 100,
       });
       return response.data.choices[0].message.content.trim();
     } catch (error) {
       if (error.response) {
-        logger.error(`Description generation failed (${error.response.status}): ${JSON.stringify(error.response.data)}`);
+        logger.error(
+          `Description generation failed (${error.response.status}): ${JSON.stringify(error.response.data)}`,
+        );
       } else {
-        logger.error('Description generation failed:', error.message);
+        logger.error("Description generation failed:", error.message);
       }
       throw error;
     }
@@ -91,10 +98,10 @@ Image Prompt: [detailed prompt]
 No commas or quotation marks in prompts.`;
 
     try {
-      const response = await this.client.post('/chat/completions', {
+      const response = await this.client.post("/chat/completions", {
         model: this.config.model,
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 500
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 500,
       });
       const output = response.data.choices[0].message.content;
       const regex = /Image Prompt:\s*(.*?)(?=Image Prompt:|$)/gs;
@@ -106,9 +113,11 @@ No commas or quotation marks in prompts.`;
       return prompts;
     } catch (error) {
       if (error.response) {
-        logger.error(`Image prompt generation failed (${error.response.status}): ${JSON.stringify(error.response.data)}`);
+        logger.error(
+          `Image prompt generation failed (${error.response.status}): ${JSON.stringify(error.response.data)}`,
+        );
       } else {
-        logger.error('Image prompt generation failed:', error.message);
+        logger.error("Image prompt generation failed:", error.message);
       }
       throw error;
     }

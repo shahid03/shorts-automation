@@ -44,9 +44,27 @@ class ImageService {
     try {
       const response = await axios.post(`${comfyui.url}/prompt`, workflow, { headers: { 'Content-Type': 'application/json' } });
       const promptId = response.data.prompt_id;
-      await this.sleep(10000);
-      const historyRes = await axios.get(`${comfyui.url}/history/${promptId}`);
-      const historyData = historyRes.data[promptId];
+      
+      // Poll for completion
+      let historyData = null;
+      let attempts = 0;
+      const maxAttempts = 120; // Wait up to 2 minutes
+      
+      while (!historyData && attempts < maxAttempts) {
+        attempts++;
+        await this.sleep(1000);
+        try {
+          const historyRes = await axios.get(`${comfyui.url}/history/${promptId}`);
+          historyData = historyRes.data[promptId];
+        } catch (e) {
+          // Ignore errors during polling, might be temporary
+        }
+      }
+
+      if (!historyData) {
+        throw new Error('Timeout waiting for ComfyUI generation');
+      }
+
       const imageFilename = historyData.outputs['9'].images[0].filename;
       const imageUrl = `${comfyui.url}/view?filename=${encodeURIComponent(imageFilename)}&type=output`;
       await this.sleep(1000);
