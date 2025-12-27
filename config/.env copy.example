@@ -1,10 +1,10 @@
 # .env.example - Copy to .env and fill in your values
 
 # === AI Model Configuration ===
-LLM_PROVIDER=google
-LLM_MODEL=gemini
-LLM_API_KEY=AIzaSyBarxfa3WAZIuWpnEvmSxWR5F3AhxMv1wY
-LLM_BASE_URL=
+LLM_PROVIDER=openrouter
+LLM_MODEL=deepseek/deepseek-chat-v3-0324
+LLM_API_KEY=your_api_key_here
+LLM_BASE_URL=https://openrouter.ai/api/v1
 
 # === Image Generation ===
 IMAGE_GEN_TYPE=comfyui
@@ -40,7 +40,7 @@ CAPTION_FONT_FAMILY=Arial
 CAPTION_BOLD=true
 
 # === Storage ===
-STORAGE_PROVIDER=minio
+STORAGE_PROVIDER=s3
 
 # === Google Drive ===
 GOOGLE_DRIVE_ENABLED=false
@@ -57,11 +57,11 @@ AWS_ACCESS_KEY_ID=your_key
 AWS_SECRET_ACCESS_KEY=your_secret
 
 # === MinIO ===
-MINIO_ENABLED=true
-MINIO_ENDPOINT=http://localhost:9001
+MINIO_ENABLED=false
+MINIO_ENDPOINT=http://localhost:9000
 MINIO_BUCKET=raw-videos
-MINIO_ACCESS_KEY_ID=D4op31KLvlOoFVgc5qMC
-MINIO_SECRET_ACCESS_KEY=gB3nD7cMTDZQLm3HSAUZTTp5FYWzjlL9b68sDj4t
+MINIO_ACCESS_KEY_ID=your_key
+MINIO_SECRET_ACCESS_KEY=your_secret
 MINIO_USE_SSL=false
 
 # === Publishing ===
@@ -79,9 +79,9 @@ INSTAGRAM_API_KEY=your_key
 INSTAGRAM_USERNAME=your_username
 
 # === Google Sheets Tracking ===
-SHEETS_ENABLED=true
+SHEETS_ENABLED=false
 SHEETS_CREDENTIALS_PATH=./config/google-credentials.json
-SHEETS_ID=1Q3-JdlQpvT4k63py1KXv8r88WBS2p0tmyWd27RfbRQk
+SHEETS_ID=your_spreadsheet_id
 SHEETS_NAME=Sheet1
 
 # === Content ===

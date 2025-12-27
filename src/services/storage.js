@@ -1,5 +1,5 @@
 const { google } = require('googleapis');
-const AWS = require('aws-sdk');
+const Minio = require('minio');
 const fs = require('fs');
 const path = require('path');
 const logger = require('../utils/logger');
@@ -11,8 +11,6 @@ class StorageService {
 
     if (this.storageType === 'googleDrive' && this.config.googleDrive.enabled) {
       this.initGoogleDrive(this.config.googleDrive);
-    } else if (this.storageType === 's3' && this.config.s3.enabled) {
-      this.initS3(this.config.s3);
     } else if (this.storageType === 'minio' && this.config.minio.enabled) {
       this.initMinio(this.config.minio);
     }
@@ -27,32 +25,36 @@ class StorageService {
     this.drive = google.drive({ version: 'v3', auth });
   }
 
-  initS3(config) {
-    this.s3 = new AWS.S3({
-      region: config.region,
-      accessKeyId: config.accessKeyId,
-      secretAccessKey: config.secretAccessKey
-    });
-    this.s3Bucket = config.bucket;
-  }
-
   initMinio(config) {
-    this.s3 = new AWS.S3({
-      endpoint: config.endpoint,
-      accessKeyId: config.accessKeyId,
-      secretAccessKey: config.secretAccessKey,
-      s3ForcePathStyle: true,
-      signatureVersion: 'v4',
-      sslEnabled: config.useSSL
+    let endPoint = config.endpoint;
+    if (endPoint.startsWith('http://')) {
+      endPoint = endPoint.replace('http://', '');
+    } else if (endPoint.startsWith('https://')) {
+      endPoint = endPoint.replace('https://', '');
+    }
+
+    let port = config.port;
+    if (endPoint.includes(':')) {
+      const parts = endPoint.split(':');
+      endPoint = parts[0];
+      port = parseInt(parts[1]);
+    }
+
+    this.minioClient = new Minio.Client({
+      endPoint: endPoint,
+      port: port,
+      useSSL: config.useSSL,
+      accessKey: config.accessKeyId,
+      secretKey: config.secretAccessKey
     });
-    this.s3Bucket = config.bucket;
+    this.bucket = config.bucket;
   }
 
   async upload(filePath, type, filename) {
     if (this.storageType === 'googleDrive') {
       return this._uploadToGoogleDrive(filePath, type, filename);
-    } else if (this.storageType === 's3' || this.storageType === 'minio') {
-      return this._uploadToS3(filePath, filename);
+    } else if (this.storageType === 'minio') {
+      return this._uploadToMinio(filePath, filename);
     }
     return null;
   }
@@ -82,20 +84,25 @@ class StorageService {
     }
   }
 
-  async _uploadToS3(filePath, filename) {
-    if (!this.s3) return;
-    const fileContent = fs.readFileSync(filePath);
+  async _uploadToMinio(filePath, filename) {
+    if (!this.minioClient) return;
     const key = path.basename(filePath);
+    
     try {
-      const response = await this.s3.upload({
-        Bucket: this.s3Bucket,
-        Key: key,
-        Body: fileContent
-      }).promise();
-      logger.info(`Uploaded to ${this.storageType}: ${response.Location}`);
-      return response;
+      const bucketExists = await this.minioClient.bucketExists(this.bucket);
+      if (!bucketExists) {
+        await this.minioClient.makeBucket(this.bucket, 'us-east-1');
+        logger.info(`Bucket ${this.bucket} created.`);
+      }
+
+      await this.minioClient.fPutObject(this.bucket, key, filePath, {
+        'Content-Type': 'application/octet-stream'
+      });
+      
+      logger.info(`Uploaded to MinIO: ${key}`);
+      return key;
     } catch (error) {
-      logger.error(`${this.storageType} upload failed: ${error.message}`);
+      logger.error(`MinIO upload failed: ${error.message}`);
       throw error;
     }
   }

@@ -57,7 +57,7 @@ module.exports = {
 
   // Storage
   storage: {
-    provider: process.env.STORAGE_PROVIDER || 's3',
+    provider: process.env.STORAGE_PROVIDER || 'minio',
     googleDrive: {
       enabled: process.env.GOOGLE_DRIVE_ENABLED === 'true',
       credentialsPath: process.env.GOOGLE_CREDENTIALS_PATH || './config/google-credentials.json',
@@ -67,16 +67,10 @@ module.exports = {
         finals: process.env.GD_FINALS_FOLDER || '1AnQ00_qdqVui3Ufh4BOahEYWfPbQ3_P_'
       }
     },
-    s3: {
-      enabled: process.env.S3_ENABLED === 'true',
-      region: process.env.AWS_REGION || 'us-east-1',
-      bucket: process.env.S3_BUCKET || 'raw-videos',
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-    },
     minio: {
       enabled: process.env.MINIO_ENABLED === 'true',
-      endpoint: process.env.MINIO_ENDPOINT || 'http://localhost:9000',
+      endpoint: process.env.MINIO_ENDPOINT || 'localhost',
+      port: parseInt(process.env.MINIO_PORT) || 9000,
       bucket: process.env.MINIO_BUCKET || 'raw-videos',
       accessKeyId: process.env.MINIO_ACCESS_KEY_ID,
       secretAccessKey: process.env.MINIO_SECRET_ACCESS_KEY,
