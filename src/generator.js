@@ -15,7 +15,7 @@ class StoicShortsGenerator {
     this.image = new ImageService(config.imageGen);
     this.voice = new VoiceService(config.voice);
     this.video = new VideoService(config.video);
-    this.storage = new StorageService(config.storage);
+    this.storage = new StorageService(config);
     this.publish = new PublishService(config.publish);
     this.sheets = config.sheets.enabled ? new SheetsService(config.sheets) : null;
   }
@@ -36,8 +36,8 @@ class StoicShortsGenerator {
       const audioPath = await this.voice.generate(script, filename);
       const audioDuration = await this.getAudioDuration(audioPath);
 
-      if (this.config.storage.googleDrive.enabled) {
-        await this.storage.uploadToGoogleDrive(audioPath, 'voiceover', filename);
+      if (this.storage.storageType) {
+        await this.storage.upload(audioPath, 'voiceover', filename);
       }
 
       logger.info('Generating image prompts...');
@@ -46,9 +46,9 @@ class StoicShortsGenerator {
       logger.info(`Generating ${imagePrompts.length} images...`);
       const imagePaths = await this.image.generateImages(imagePrompts, filename);
 
-      if (this.config.storage.googleDrive.enabled) {
+      if (this.storage.storageType) {
         for (const imgPath of imagePaths) {
-          await this.storage.uploadToGoogleDrive(imgPath, 'image', filename);
+          await this.storage.upload(imgPath, 'image', filename);
         }
       }
 
@@ -59,14 +59,14 @@ class StoicShortsGenerator {
       let finalVideoPath = rawVideoPath;
       if (this.config.captions.enabled) {
         logger.info('Adding captions...');
-        if (this.config.storage.s3.enabled) {
-          await this.storage.uploadToS3(rawVideoPath, filename);
+        if (this.storage.storageType) {
+          await this.storage.upload(rawVideoPath, 'raw', filename);
         }
         finalVideoPath = await this.video.addCaptions(rawVideoPath, filename, this.config.captions);
       }
 
-      if (this.config.storage.googleDrive.enabled) {
-        await this.storage.uploadToGoogleDrive(finalVideoPath, 'final', filename);
+      if (this.storage.storageType) {
+        await this.storage.upload(finalVideoPath, 'final', filename);
       }
 
       const publishResults = {};
