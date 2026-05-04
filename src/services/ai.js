@@ -18,23 +18,18 @@ class AIService {
       contentConfig.themes[
         Math.floor(Math.random() * contentConfig.themes.length)
       ];
-    const prompt = `Write a single original stoic quote in the style of Marcus Aurelius or Seneca. Begin with a very short narrative hook (1-2 sentences), set in ancient Rome, followed by a single deep, reflective quote.
-
-Add a short, poetic title (max 5 words) that captures the essence or emotion of the piece.
-
-Theme: ${theme}
+    const basePrompt = contentConfig.promptTemplate.replace("{theme}", theme);
+    const prompt = `${basePrompt}
 
 Requirements:
-- Entire piece (story + quote) must be under ${contentConfig.maxWords} words.
-- Use Roman imagery (baths, temples, generals, scrolls, statues, etc).
-- Sound timeless, wise, and stoic.
+- Entire piece must be under ${contentConfig.maxWords} words.
+- Sound timeless, wise, and appropriate for the theme.
 - Written in elevated but clear English.
 
-Output as JSON with three fields:
+Output as JSON with two fields:
 {
-  "title": "<5-word title>",
-  "story": "<short narrative setup>",
-  "quote": "<stoic reflection>"
+  "title": "<short catchy title>",
+  "script": "<the full text to be spoken in the video>"
 }`;
 
     try {
@@ -58,10 +53,10 @@ Output as JSON with three fields:
   }
 
   async generateDescription(content, keywords) {
-    const prompt = `Based on the title, story, and quote, write a catchy YouTube description (max 30 words):
+    const prompt = `Based on the title and script, write a catchy YouTube description (max 30 words):
 
 Title: ${content.title}
-Story & Quote: ${content.story}, ${content.quote}
+Script: ${content.script}
 Keywords: ${keywords}
 
 Only output the description, no formatting.`;
@@ -86,10 +81,11 @@ Only output the description, no formatting.`;
   }
 
   async generateImagePrompts(content, numImages) {
-    const prompt = `Give me ${numImages} detailed prompts to generate images based on this story and quote. The videos are stoic, ancient Rome themed, like Marcus Aurelius and Seneca.
+    const prompt = `Give me ${numImages} detailed prompts to generate images based on this script.
 
-Story: ${content.story}
-Quote: ${content.quote}
+Style: ${this.config.imageStylePrompt || "cinematic lighting, ultra-realistic"}
+
+Script: ${content.script}
 
 Only output prompts in this format:
 Image Prompt: [detailed prompt]

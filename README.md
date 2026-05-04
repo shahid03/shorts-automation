@@ -1,11 +1,11 @@
-# 🏛️ Stoic Shorts Automation
+# 🎬 Shorts Automation
 
-An automated pipeline for generating, rendering, and publishing Stoic-themed short videos. This tool leverages AI services (Local or Cloud) to create original narratives, quotes, voiceovers, and imagery, combining them into polished short-form videos for social media.
+An automated pipeline for generating, rendering, and publishing configurable short videos. This tool leverages AI services (Local or Cloud) to create original scripts, voiceovers, and imagery, combining them into polished short-form videos for any niche—from Stoic philosophy to food vlogs.
 
 ## ✨ Features
 
-- **🤖 AI Content Generation:** Uses LLMs (OpenRouter/DeepSeek) to craft unique Stoic stories and quotes set in ancient Rome.
-- **🎨 AI Image Generation:** Integrates with **ComfyUI** (running locally or on Google Colab) to generate consistent, themed visuals.
+- **🤖 Configurable AI Content:** Define any persona or theme via prompt templates. Generate scripts for vlogs, educational facts, or character-driven stories.
+- **🎨 Dynamic Image Generation:** Integrates with **ComfyUI** to generate consistent visuals tailored to your specific theme and style prompts.
 - **🎙️ Voice Synthesis:** Uses **Kokoro TTS** for high-quality, natural-sounding voiceovers.
 - **🎬 Automated Editing:** Compiles images and audio with transitions using **FFmpeg**.
 - **📝 Smart Captions:** Auto-generates and overlays stylized captions (optional).
@@ -17,9 +17,9 @@ An automated pipeline for generating, rendering, and publishing Stoic-themed sho
 
 The system operates as a linear pipeline:
 
-1.  **Content:** LLM generates a Title, Story, Quote, and Image Prompts.
-2.  **Audio:** TTS engine converts the script to a `.wav` file.
-3.  **Visuals:** Image generator renders scenes based on the prompts.
+1.  **Content:** LLM generates a Title, Script, and Image Prompts based on your `CONTENT_PROMPT_TEMPLATE`.
+2.  **Audio:** TTS engine converts the `script` to a `.wav` file.
+3.  **Visuals:** Image generator renders scenes based on image prompts and `IMAGE_STYLE_PROMPT`.
 4.  **Assembly:** Video engine stitches images + audio + transitions.
 5.  **Post-Processing:** Captions are generated and burned in.
 6.  **Archival:** Final assets are uploaded to MinIO/Google Drive.
@@ -127,11 +127,30 @@ Key configuration options in `.env`:
 | Category | Variable | Description |
 |----------|----------|-------------|
 | **AI** | `LLM_API_KEY` | API Key for the LLM provider. |
+| **Content** | `CONTENT_PROMPT_TEMPLATE` | The instruction for the AI (use `{theme}` as a placeholder). |
+| **Content** | `CONTENT_THEMES` | Comma-separated list of topics/themes to rotate through. |
+| **Images** | `IMAGE_STYLE_PROMPT` | The visual style for generated images (e.g., "cinematic lighting"). |
 | **Images** | `COMFYUI_URL` | URL of your ComfyUI instance (Local or Cloudflare). |
 | **Voice** | `VOICE_URL` | URL of your TTS service. |
 | **Storage** | `STORAGE_PROVIDER` | `minio` (default) or `googleDrive`. |
 | **MinIO** | `MINIO_ENDPOINT` | Hostname of MinIO (e.g., `localhost`). |
 | **MinIO** | `MINIO_BUCKET` | Bucket name for storing videos. |
+
+## 💡 Example Theme Configurations
+
+### 🍕 Food Vlog Theme
+```env
+CONTENT_PROMPT_TEMPLATE="Write a short, high-energy script where a {theme} describes its own ingredients and why it's delicious. Use 'vlogger' slang."
+CONTENT_THEMES="pepperoni pizza,sushi roll,chocolate lava cake"
+IMAGE_STYLE_PROMPT="bright studio lighting, high-end food photography, macro shots, 8k"
+```
+
+### 🧘 Stoic Philosophy (Original)
+```env
+CONTENT_PROMPT_TEMPLATE="Write a single original stoic quote in the style of Marcus Aurelius or Seneca. Begin with a very short narrative hook (1-2 sentences), set in ancient Rome, followed by a single deep, reflective quote. Theme: {theme}"
+CONTENT_THEMES="death,pride,discipline,humility"
+IMAGE_STYLE_PROMPT="cinematic, ancient Rome, marble statues, moody lighting, epic scale"
+```
 
 ## 📦 Project Structure
 

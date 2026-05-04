@@ -133,6 +133,12 @@ module.exports = {
       process.env.CONTENT_THEMES ||
       "death,pride,discipline,humility,impermanence,glory,silence,duty,control,time"
     ).split(","),
+    promptTemplate:
+      process.env.CONTENT_PROMPT_TEMPLATE ||
+      "Write a single original stoic quote in the style of Marcus Aurelius or Seneca. Begin with a very short narrative hook (1-2 sentences), set in ancient Rome, followed by a single deep, reflective quote. Theme: {theme}",
+    imageStylePrompt:
+      process.env.IMAGE_STYLE_PROMPT ||
+      "The videos are stoic, ancient Rome themed, like Marcus Aurelius and Seneca.",
     maxWords: parseInt(process.env.MAX_WORDS) || 45,
   },
 

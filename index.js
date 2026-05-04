@@ -1,12 +1,12 @@
 // index.js - Main entry point
-const StoicShortsGenerator = require('./src/generator');
+const ShortsGenerator = require('./src/generator');
 const config = require('./config/config');
 const logger = require('./src/utils/logger');
 
 async function main() {
   try {
-    logger.info('Starting Stoic Shorts automation...');
-    const generator = new StoicShortsGenerator(config);
+    logger.info('Starting Shorts automation...');
+    const generator = new ShortsGenerator(config);
     await generator.run();
     logger.info('Automation completed successfully');
   } catch (error) {
