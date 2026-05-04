@@ -8,7 +8,7 @@ const PublishService = require('./services/publish');
 const SheetsService = require('./services/sheets');
 const logger = require('./utils/logger');
 
-class StoicShortsGenerator {
+class ShortsGenerator {
   constructor(config) {
     this.config = config;
     this.ai = new AIService(config.llm);
@@ -22,7 +22,7 @@ class StoicShortsGenerator {
 
   async run() {
     try {
-      logger.info('Generating story and quote...');
+      logger.info('Generating content...');
       const content = await this.ai.generateContent(this.config.content);
       logger.info(`Generated: ${content.title}`);
 
@@ -30,7 +30,7 @@ class StoicShortsGenerator {
       const description = await this.ai.generateDescription(content, this.config.content.keywords);
 
       const filename = this.sanitizeFilename(content.title);
-      const script = `${content.story}${content.quote}`;
+      const script = content.script;
 
       logger.info('Generating voiceover...');
       const audioPath = await this.voice.generate(script, filename);
@@ -122,3 +122,4 @@ class StoicShortsGenerator {
 }
 
 module.exports = StoicShortsGenerator;
+.exports = ShortsGenerator;
