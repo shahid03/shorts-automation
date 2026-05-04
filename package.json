@@ -1,5 +1,5 @@
 {
-  "name": "stoic-shorts-automation",
+  "name": "shorts-automation",
   "version": "1.0.0",
   "description": "Automated Stoic short video generation and publishing system",
   "main": "index.js",

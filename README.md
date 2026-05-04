@@ -43,7 +43,7 @@ Ensure these services are running locally or are accessible remotely:
 1.  **Clone the repository:**
     ```bash
     git clone <repository-url>
-    cd stoic-shorts-automation
+    cd shorts-automation
     ```
 
 2.  **Install dependencies:**
@@ -136,7 +136,7 @@ Key configuration options in `.env`:
 ## 📦 Project Structure
 
 ```
-stoic-shorts-automation/
+shorts-automation/
 ├── config/              # Central configuration logic
 ├── src/
 │   ├── generator.js     # Main pipeline controller
